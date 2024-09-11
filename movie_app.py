@@ -1,6 +1,7 @@
 from istorage import IStorage
 from omdb_client import OMDbAPIClient
 import random
+import statistics
 
 
 class MovieApp:
@@ -12,7 +13,7 @@ class MovieApp:
         """List all the movies in the storage."""
         movies = self._storage.list_movies()
         movie_length = len(movies)
-        print(f"There are {movie_length} in the list.")
+        print(f"There are {movie_length} movies in the list.")
         if movies:
             for title, details in movies.items():
                 imdb_url = details.get('imdb_url', 'URL not available')
@@ -63,15 +64,34 @@ class MovieApp:
         print(f"Movie '{title}' successfully updated.")
 
     def _command_movie_stats(self):
-        """Calculate and display statistics about the movies."""
+        """
+        Display statistics about the movies:
+        - Average rating
+        - Median rating
+        - Best rated movie
+        - Worst rated movie
+        """
         movies = self._storage.list_movies()
         if not movies:
             print("No movies available for statistics.")
             return
 
-        total_rating = sum(float(details.get('rating', 0)) for details in movies.values())
-        avg_rating = total_rating / len(movies)
+        ratings = [float(details.get('rating', 0)) for details in movies.values() if details.get('rating') is not None]
+
+        if not ratings:
+            print("No ratings available for statistics.")
+            return
+
+        avg_rating = sum(ratings) / len(ratings)
+        median_rating = statistics.median(ratings)
+
+        best_movie = max(movies.items(), key=lambda x: float(x[1].get('rating', 0)))
+        worst_movie = min(movies.items(), key=lambda x: float(x[1].get('rating', 0)))
+
         print(f"Average rating of all movies: {avg_rating:.2f} stars.")
+        print(f"Median rating of all movies: {median_rating:.2f} stars.")
+        print(f"Best rated movie: {best_movie[0]} with {best_movie[1].get('rating', 'Not rated')} stars.")
+        print(f"Worst rated movie: {worst_movie[0]} with {worst_movie[1].get('rating', 'Not rated')} stars.")
 
     def _command_generate_website(self):
         """Generate a website from the movie data."""
@@ -117,10 +137,32 @@ class MovieApp:
         print(f"Your movie for tonight is {random_movie_title}.")
 
     def _command_search_movie(self):
-        pass
+        """
+            Search for movies by title or partial title.
+        """
+        query = input("Enter movie title or part of the title to search: ").lower()
+        movies = self._storage.list_movies()
+
+        found_movies = {title: details for title, details in movies.items() if query in title.lower()}
+
+        if found_movies:
+            for title, details in found_movies.items():
+                print(f"{title}: {details.get('year', 'Unknown')} - {details.get('rating', 'Not rated')} stars")
+        else:
+            print("No movies found.")
 
     def _command_sort_by_rating(self):
-        pass
+        """
+            Sort and display movies by their rating in descending order.
+        """
+        movies = self._storage.list_movies()
+        sorted_movies = sorted(movies.items(), key=lambda x: float(x[1].get('rating', 0)), reverse=True)
+
+        if sorted_movies:
+            for title, details in sorted_movies:
+                print(f"{title}: {details.get('year', 'Unknown')} - {details.get('rating', 'Not rated')} stars")
+        else:
+            print("No movies found.")
 
     def run(self):
         """Main loop to run the movie app."""
