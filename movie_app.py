@@ -137,9 +137,7 @@ class MovieApp:
         print(f"Your movie for tonight is {random_movie_title}.")
 
     def _command_search_movie(self):
-        """
-            Search for movies by title or partial title.
-        """
+        """Search for movies by title or partial title."""
         query = input("Enter movie title or part of the title to search: ").lower()
         movies = self._storage.list_movies()
 
@@ -152,9 +150,7 @@ class MovieApp:
             print("No movies found.")
 
     def _command_sort_by_rating(self):
-        """
-            Sort and display movies by their rating in descending order.
-        """
+        """Sort and display movies by their rating in descending order."""
         movies = self._storage.list_movies()
         sorted_movies = sorted(movies.items(), key=lambda x: float(x[1].get('rating', 0)), reverse=True)
 

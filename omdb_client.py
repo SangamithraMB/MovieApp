@@ -28,7 +28,6 @@ class OMDbAPIClient:
         return None
 
 
-# Example usage:
 if __name__ == "__main__":
     api_key = os.getenv('OMDB_API_KEY')
 
