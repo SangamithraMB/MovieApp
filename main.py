@@ -9,6 +9,7 @@ load_dotenv()
 
 
 def main():
+    """Main Function"""
     parser = argparse.ArgumentParser(description='Movie App with custom storage file')
 
     parser.add_argument('storage_file', type=str, help='The storage file for movie data (CSV or JSON)')
